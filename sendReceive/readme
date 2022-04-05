@@ -1,0 +1,7 @@
+These scripts are able to send and receive data in both ends
+
+The raspberry however only sends one data type which is the camera frame
+
+GUI sends a simple string
+
+Still needs to be able to send multiple data types from raspberry, and be able to decode it in GUI
