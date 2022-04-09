@@ -29,23 +29,15 @@ class VideoThread(QThread):
         self._run_flag = True
 
     def run(self):
-        # capture from web cam
-        # cap = cv2.VideoCapture(0)
-        # while self._run_flag:
-            
-            
-            #a.set_temp(TempValue)
-            #a.set_depth(DepthValue)
-            #a.set_salinity(SalinityValue)
 
-        #     ret, cv_img = cap.read()
-        #     if ret:
-        #
+        # Looks for new piture data and displays it in GUI
         while self._run_flag:
-            if (len(config.rovCamera) > 10):
-                self.change_pixmap_signal.emit(config.rovCamera)
-                config.rovCamera = np.array([])
-        # shut down capture system
+            try:
+                if (len(config.rovCamera) > 10):
+                    self.change_pixmap_signal.emit(config.rovCamera)
+                    config.rovCamera = np.array([])
+            except:
+                print("probably something with datatype")
 
     def stop(self):
         """Sets run flag to False and waits for thread to finish"""
@@ -54,19 +46,13 @@ class VideoThread(QThread):
 
 
 
-
-
-
 class App(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ROV-AIP USER INTERFACE")
-
         self.setGeometry(0,0,1920,1080)
         self.setStyleSheet("background-color: rgb(93, 93, 93);")
 
-
-        # Defines sonar position in GUI
         self.image_label = QLabel(self)
         self.image_label.setGeometry(690, 0, 1221, 671)
         self.image_label.setFrameShape(QtWidgets.QFrame.Panel)
@@ -76,12 +62,11 @@ class App(QWidget):
         self.sonar.setGeometry(0, 0, 690, 671)
         self.sonar.setFrameShape(QtWidgets.QFrame.Panel)
 
-        #Direction Buttons
-        
+
         self.Forward = QtWidgets.QToolButton(self)
         self.Forward.setGeometry(QtCore.QRect(1280, 770, 51, 41))
         self.Forward.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.Forward.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_forward.png'))
+        self.Forward.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_forward.png'))
         self.Forward.setIconSize(QtCore.QSize(32, 32))
         self.Forward.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.Forward.setArrowType(QtCore.Qt.NoArrow)
@@ -391,7 +376,8 @@ class App(QWidget):
         self.thread.stop()
         event.accept()
 
-
+    def setSonarPlot(self, image):
+        self.sonar.setPixmap(QPixmap.fromImage(image))
 
     #@pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -407,6 +393,8 @@ class App(QWidget):
         convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
         p = convert_to_Qt_format.scaled(1920,960, Qt.KeepAspectRatio)
         return QPixmap.fromImage(p)
+
+
 
     def set_temp (self, temp):
         self.Temp.display(temp)
