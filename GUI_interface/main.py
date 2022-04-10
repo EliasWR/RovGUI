@@ -30,14 +30,11 @@ image = np.zeros((length, length, 1), np.uint8)
 # For checking if any commands has changed
 PrevRaspDataOut = {}
 
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((SERVER, PORT))
 print(f"[NEW CONNECTION] With {SERVER} established")
 
-
 def plotSonarInput(angle, step, data_lst):
-
     # max_range = 80*200*1450/2   # Might have to be found from sonar class
     # length = 640
     # image = np.zeros((length, length, 1), np.uint8)   # Resetted image every iteration
@@ -56,66 +53,71 @@ def plotSonarInput(angle, step, data_lst):
         for k in np.linspace(0,step,8*step):
             image[int(center[0]+i*cos(2*pi*(angle+k)/400)), int(center[1]+i*sin(2*pi*(angle+k)/400)), 0] = pointColor
 
-    #color = cv2.applyColorMap(image,cv2.COLORMAP_JET)
-    cv2.imshow('Sonar Image',image)
-    cv2.waitKey(25)
-    #a._self.sonarPlot = image
+    imageColored = cv2.applyColorMap(image, cv2.COLORMAP_JET)
+    a.update_sonar(imageColored)
+
+    
 
 def TCPCom():
-    
+
     while 1:
         full_msg = b''
         new_msg = True
         while 1:
+            # print("Receiving data from raspberry")
             msg = s.recv(8192) # Prev 16
             if new_msg:
                 msglen = int(msg[:HEADERSIZE])
                 new_msg = False
 
             full_msg += msg
+            # print(f"Full messsage: {len(full_msg)}")
 
             if len(full_msg)-HEADERSIZE == msglen:
 
                 RaspDataIn = pickle.loads(full_msg[HEADERSIZE:])
 
                 img = RaspDataIn["image"]
-                print(f'temperature value: {RaspDataIn["temp"]}')
-                print(f'pressure value: {RaspDataIn["pressure"]}')
-                print(f'leak value: {RaspDataIn["leak"]}')
-                print(f'Angle: {RaspDataIn["angle"]}')
-                print(f'Step: {RaspDataIn["step"]}')
-                print(f'lockedZones: {RaspDataIn["lockedZones"]}')
                 
-                # print(f'length of sonar data readings: {len(RaspDataIn["dataArray"])}') 
-                plotSonarInput(RaspDataIn["angle"], RaspDataIn["step"], RaspDataIn["dataArray"])
+                config.temp = RaspDataIn["temp"]
+                config.pressure = RaspDataIn["pressure"]
+                config.leak = RaspDataIn["leak"]
+                config.interlockedZones = RaspDataIn["lockedZones"]
 
-                # config.rovCamera = img
-                # cv2.imshow('ROV Camera feed', img)
-                # 
-                # if cv2.waitKey(1) == 27: 
-                #     break  # esc to quit
+                plotSonarInput(RaspDataIn["angle"], RaspDataIn["step"], RaspDataIn["dataArray"])
                 
                 new_msg = True
                 full_msg = b""
 
-                # FORMING MESSAGE FOR RASPBERRY
-                RaspDataOut = {
-                    "light": 30,
-                    "runZone": -1,
-                    "mode": 0,
-                    "forceReset": True
-                }
-                # print(RaspDataOut)
-                # print(PrevRaspDataOut)
-                # if (RaspDataOut != PrevRaspDataOut):
+            # If TCP packets had to many errors and accumulated enough data
+            # logic would no longer work to see data, therefore ignore all
+            # accumulated data.
+            # Each message sent from Raspberry is 2569 bytes
+            # Therefore this finds if multiple messages has been stored in
+            # the buffer memory
+            if len(full_msg) > 2500:
+                new_msg = True
+                full_msg = b""
+                
+            
+            # If GUI has had user input, respond with new commands
+            if config.newCommands:
+                print("[ATTENTION] New commands sent to Raspberry")
 
-                print(f"Run zone from GUI")
-                PrevRaspDataOut = RaspDataOut
+                RaspDataOut = {
+                    "light": config.light,
+                    "runZone": config.runZone,
+                    "mode": config.mode,
+                    "forceReset": config.forceReset
+                }
+
+                print(RaspDataOut)
+                config.newCommands = False
+
                 RaspDataOut = pickle.dumps(RaspDataOut)
                 RaspDataOut = bytes(f'{len(RaspDataOut):<{HEADERSIZE}}', 'utf-8') + RaspDataOut
                 s.send(RaspDataOut)
-                
-
+            
 def UDPCom():
     MAX_DGRAM = 2**16
     def dump_buffer(s):
@@ -137,21 +139,20 @@ def UDPCom():
     dump_buffer(s)
 
     while True:
-        seg, addr = s.recvfrom(MAX_DGRAM)
+        seg, _ = s.recvfrom(MAX_DGRAM)
         if struct.unpack("B", seg[0:1])[0] > 1:
             dat += seg[1:]
         else:
             dat += seg[1:]
             img = cv2.imdecode(np.frombuffer(dat, dtype=np.uint8), 1)
             try:
-                # cv2.imshow('frame', img)
                 config.rovCamera = img
             except:
                 print("error (-215:Assertion failed)")
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             dat = b''
-    # cap.release()
+
     cv2.destroyAllWindows()
     s.close()
 
@@ -167,6 +168,9 @@ runZone=-1
 
 if __name__=="__main__":
 
+    app = QApplication(sys.argv)
+    a = App()
+
     # Opening an UDP server in GUI application
     cam_communication = threading.Thread(target=UDPCom)
     cam_communication.start()
@@ -176,7 +180,6 @@ if __name__=="__main__":
     other_communication.start()
 
 
-    app = QApplication(sys.argv)
-    a = App()
+    
     a.show()
     sys.exit(app.exec_())

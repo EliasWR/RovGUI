@@ -19,8 +19,6 @@ AvgSalinity=33
 AvgDepth=70
 runZone=-1
 
-
-
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
@@ -29,7 +27,6 @@ class VideoThread(QThread):
         self._run_flag = True
 
     def run(self):
-
         # Looks for new piture data and displays it in GUI
         while self._run_flag:
             try:
@@ -40,11 +37,11 @@ class VideoThread(QThread):
                 print("probably something with datatype")
 
     def stop(self):
-        """Sets run flag to False and waits for thread to finish"""
+        """
+        Sets run flag to False and waits for thread to finish
+        """
         self._run_flag = False
         self.wait()
-
-
 
 class App(QWidget):
     def __init__(self):
@@ -54,14 +51,14 @@ class App(QWidget):
         self.setStyleSheet("background-color: rgb(93, 93, 93);")
 
         self.image_label = QLabel(self)
-        self.image_label.setGeometry(690, 0, 1221, 671)
+        self.image_label.setGeometry(690, 0, 1221, 671) # Last argument 671
         self.image_label.setFrameShape(QtWidgets.QFrame.Panel)
+
         self.sonar=QLabel(self)
         self.sonar.setText("Sonar_Placeholder")
         self.sonar.setStyleSheet("background-color: rgb(134, 134, 134);")
         self.sonar.setGeometry(0, 0, 690, 671)
         self.sonar.setFrameShape(QtWidgets.QFrame.Panel)
-
 
         self.Forward = QtWidgets.QToolButton(self)
         self.Forward.setGeometry(QtCore.QRect(1280, 770, 51, 41))
@@ -77,7 +74,7 @@ class App(QWidget):
         self.Reverse = QtWidgets.QToolButton(self)
         self.Reverse.setGeometry(QtCore.QRect(1280, 870, 51, 41))
         self.Reverse.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.Reverse.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_reverse.png'))
+        self.Reverse.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_reverse.png'))
         self.Reverse.setIconSize(QtCore.QSize(32, 32))
         self.Reverse.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.Reverse.setArrowType(QtCore.Qt.NoArrow)
@@ -88,7 +85,7 @@ class App(QWidget):
         self.Left = QtWidgets.QToolButton(self)
         self.Left.setGeometry(QtCore.QRect(1210, 820, 51, 41))
         self.Left.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.Left.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_left.png'))
+        self.Left.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_left.png'))
         self.Left.setIconSize(QtCore.QSize(32, 32))
         self.Left.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.Left.setArrowType(QtCore.Qt.NoArrow)
@@ -99,7 +96,7 @@ class App(QWidget):
         self.Right = QtWidgets.QToolButton(self)
         self.Right.setGeometry(QtCore.QRect(1350, 820, 51, 41))
         self.Right.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.Right.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_right.png'))
+        self.Right.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_right.png'))
         self.Right.setIconSize(QtCore.QSize(32, 32))
         self.Right.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.Right.setArrowType(QtCore.Qt.NoArrow)
@@ -110,7 +107,7 @@ class App(QWidget):
         self.ForwardRight = QtWidgets.QToolButton(self)
         self.ForwardRight.setGeometry(QtCore.QRect(1350, 770, 51, 41))
         self.ForwardRight.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.ForwardRight.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_forward_right.png'))
+        self.ForwardRight.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_forward_right.png'))
         self.ForwardRight.setIconSize(QtCore.QSize(32, 32))
         self.ForwardRight.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.ForwardRight.setObjectName("ForwardRight")
@@ -120,7 +117,7 @@ class App(QWidget):
         self.ForwardLeft = QtWidgets.QToolButton(self)
         self.ForwardLeft.setGeometry(QtCore.QRect(1210, 770, 51, 41))
         self.ForwardLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.ForwardLeft.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_forward_left.png'))
+        self.ForwardLeft.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_forward_left.png'))
         self.ForwardLeft.setIconSize(QtCore.QSize(32, 32))
         self.ForwardLeft.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.ForwardLeft.setObjectName("ForwardLeft")
@@ -130,7 +127,7 @@ class App(QWidget):
         self.ReverseLeft = QtWidgets.QToolButton(self)
         self.ReverseLeft.setGeometry(QtCore.QRect(1210, 870, 51, 41))
         self.ReverseLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.ReverseLeft.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_reverse_left.png'))
+        self.ReverseLeft.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_reverse_left.png'))
         self.ReverseLeft.setIconSize(QtCore.QSize(32, 32))
         self.ReverseLeft.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.ReverseLeft.setObjectName("ReverseLeft")
@@ -140,7 +137,7 @@ class App(QWidget):
         self.ReverseRight = QtWidgets.QToolButton(self)
         self.ReverseRight.setGeometry(QtCore.QRect(1350, 870, 51, 41))
         self.ReverseRight.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.ReverseRight.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_reverse_right.png'))
+        self.ReverseRight.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_reverse_right.png'))
         self.ReverseRight.setIconSize(QtCore.QSize(32, 32))
         self.ReverseRight.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.ReverseRight.setObjectName("ReverseRight")
@@ -150,7 +147,7 @@ class App(QWidget):
         self.CounterClockwise = QtWidgets.QToolButton(self)
         self.CounterClockwise.setGeometry(QtCore.QRect(1210, 710, 51, 41))
         self.CounterClockwise.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.CounterClockwise.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_rotate_left.png'))
+        self.CounterClockwise.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_rotate_left.png'))
         self.CounterClockwise.setIconSize(QtCore.QSize(32, 32))
         self.CounterClockwise.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.CounterClockwise.setObjectName("CounterClockwise")
@@ -160,7 +157,7 @@ class App(QWidget):
         self.Clockwise = QtWidgets.QToolButton(self)
         self.Clockwise.setGeometry(QtCore.QRect(1350, 710, 51, 41))
         self.Clockwise.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.Clockwise.setIcon(QtGui.QIcon('FinalGUI\Icons\icon_rotate_right.png'))
+        self.Clockwise.setIcon(QtGui.QIcon('GUI_interface\Icons\icon_rotate_right.png'))
         self.Clockwise.setIconSize(QtCore.QSize(32, 32))
         self.Clockwise.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.Clockwise.setObjectName("Clockwise")
@@ -177,7 +174,7 @@ class App(QWidget):
         self.Temp.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Temp.setProperty("value", 0.0)
         self.Temp.setObjectName("Temp")
-        # self.Temp.display(TempValue)
+        self.Temp.display(config.temp)
 
         self.Depth = QtWidgets.QLCDNumber(self)
         self.Depth.setGeometry(QtCore.QRect(30, 790, 141, 31))
@@ -240,7 +237,7 @@ class App(QWidget):
         self.Light_Value_Slider.setObjectName("Light_Value_Slider")
         self.Light_Value_Slider.setMaximum(255)
         self.Light_Value_Slider.setMinimum(0)
-        self.Light_Value_Slider.valueChanged.connect(self.valuechangeLS)
+        self.Light_Value_Slider.valueChanged.connect(self.userInteractLights)
 
         self.Motor_Speed_Slider = QtWidgets.QSlider(self)
         self.Motor_Speed_Slider.setGeometry(QtCore.QRect(770, 710, 61, 201))
@@ -250,9 +247,8 @@ class App(QWidget):
         self.Motor_Speed_Slider.setObjectName("Motor_Speed_Slider")
         self.Motor_Speed_Slider.setMaximum(255)
         self.Motor_Speed_Slider.setMinimum(0)
-        self.Motor_Speed_Slider.valueChanged.connect(self.valuechangeMS)
+        # self.Motor_Speed_Slider.valueChanged.connect(self.valuechangeMS)
 
-        #Diffrent buttons
         self.ResetButton = QtWidgets.QPushButton(self)
         self.ResetButton.setGeometry(QtCore.QRect(1580, 800, 171, 61))
         self.ResetButton.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
@@ -260,19 +256,34 @@ class App(QWidget):
         self.ResetButton.setText("Reset")
         self.ResetButton.clicked.connect(self.Resetbutton)
 
-        self.ScanModeB = QtWidgets.QPushButton(self)
-        self.ScanModeB.setGeometry(QtCore.QRect(470, 720, 161, 71))
-        self.ScanModeB.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.ScanModeB.setObjectName("ScanModeB")
-        self.ScanModeB.setText("ScanMode")
-        self.ScanModeB.clicked.connect(self.SonarM2)
 
-        self.CollisionAvoidB = QtWidgets.QPushButton(self)
-        self.CollisionAvoidB.setGeometry(QtCore.QRect(470, 830, 161, 71))
-        self.CollisionAvoidB.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.CollisionAvoidB.setObjectName("CollisionAvoidB")
-        self.CollisionAvoidB.setText("Collision Avoidance")
-        self.CollisionAvoidB.clicked.connect(self.SonarM1)
+        self.ScanMode20m = QtWidgets.QPushButton(self)
+        self.ScanMode20m.setGeometry(QtCore.QRect(450, 710, 200, 71))
+        self.ScanMode20m.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ScanMode20m.setObjectName("ScanMode20m")
+        self.ScanMode20m.setText("Scanning [20m]")
+        self.ScanMode20m.clicked.connect(lambda: self.userInteractModeSonar(0))
+
+        self.ScanMode50m = QtWidgets.QPushButton(self)
+        self.ScanMode50m.setGeometry(QtCore.QRect(450, 790, 200, 71))
+        self.ScanMode50m.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ScanMode50m.setObjectName("ScanMode50m")
+        self.ScanMode50m.setText("Scanning [50m]")
+        self.ScanMode50m.clicked.connect(lambda: self.userInteractModeSonar(1))
+        
+        self.CollisionAvoid2m = QtWidgets.QPushButton(self)
+        self.CollisionAvoid2m.setGeometry(QtCore.QRect(450, 870, 200, 71))
+        self.CollisionAvoid2m.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.CollisionAvoid2m.setObjectName("CollisionAvoid2m")
+        self.CollisionAvoid2m.setText("Collision Prevention [2m]")
+        self.CollisionAvoid2m.clicked.connect(lambda: self.userInteractModeSonar(2))
+
+        self.CollisionAvoid4m = QtWidgets.QPushButton(self)
+        self.CollisionAvoid4m.setGeometry(QtCore.QRect(450, 950, 200, 71))
+        self.CollisionAvoid4m.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.CollisionAvoid4m.setObjectName("CollisionAvoid4m")
+        self.CollisionAvoid4m.setText("Collision Prevention [4m]")
+        self.CollisionAvoid4m.clicked.connect(lambda: self.userInteractModeSonar(3))
 
         #Labels
 
@@ -355,7 +366,7 @@ class App(QWidget):
         self.SonarMode.setFrameShape(QtWidgets.QFrame.Box)
         self.SonarMode.setObjectName("SonarMode")
         self.SonarMode.setText("Current Sonar Mode: ")
-
+        
         self.WarningLable = QtWidgets.QLabel(self)
         self.WarningLable.setGeometry(QtCore.QRect(1550, 740, 231, 31))
         self.WarningLable.setStyleSheet("background-color: rgb(134, 134, 134);")
@@ -363,7 +374,6 @@ class App(QWidget):
         self.WarningLable.setObjectName("WarningLable")
         self.WarningLable.setText("Warning in Zone: ")
         
-
         # create the video capture thread
         self.thread = VideoThread()
         # connect its signal to the update_image slot
@@ -372,18 +382,20 @@ class App(QWidget):
         self.thread.start()
 
 
+
     def closeEvent(self, event):
         self.thread.stop()
         event.accept()
-
-    def setSonarPlot(self, image):
-        self.sonar.setPixmap(QPixmap.fromImage(image))
 
     #@pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
         qt_img = self.convert_cv_qt(cv_img)
         self.image_label.setPixmap(qt_img)
+    
+    def update_sonar(self, cv_img):
+        qt_img = self.convert_cv_qt(cv_img)
+        self.sonar.setPixmap(qt_img)
     
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
@@ -395,9 +407,8 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
 
-
-    def set_temp (self, temp):
-        self.Temp.display(temp)
+    # def set_temp (self, temp):
+    #     self.Temp.display(temp)
 
     def set_depth (self, depth):
         self.Depth.display(depth)
@@ -405,41 +416,40 @@ class App(QWidget):
     def set_salinity (self, salinity):
         self.Salinity.display(salinity)
 
-    #GUI Functions
+
+    # GUI functions
     def release(self):
-        self.runZone = -1
-        print(self.runZone)
+        config.runZone = -1
+        config.newCommands = True
 
     def activateZone(self, zone):
-        self.runZone = zone
-        print(self.runZone)
-
-
+        config.runZone = zone
+        config.newCommands = True
 
 
     #Collision Avoid Button
-    def SonarM1(self):
-        self.SonarMode.setText("Current Sonar Mode: Avoid")
-        global SonarMode
-        SonarMode = "Avoid"
-        print(SonarMode)
+    def userInteractModeSonar(self, mode):
+        display_string = ""
+        if mode == 1:
+            display_string = "Collision avoidance"
+        elif mode == 2:
+            display_string = "Aquaculture inspection"
+        
+        self.SonarMode.setText(f"Sonar Mode: {display_string}")
+        config.mode = mode
+        config.newCommands = True
 
-    #Sonar Scan Button
-    def SonarM2(self):
-        self.SonarMode.setText("Current Sonar Mode: Scan")
-        global SonarMode
-        SonarMode = "Scan"
-        print(SonarMode)
 
+    """ 
     def valuechangeMS(self):
         global MotorSpeed
         MotorSpeed = self.Motor_Speed_Slider.value()
         print(MotorSpeed)
-
-    def valuechangeLS(self):
-        global LightStrength
-        LightStrength = self.Light_Value_Slider.value()
-        print(LightStrength)
+    """
+    
+    def userInteractLights(self):
+        config.light = self.Light_Value_Slider.value()
+        config.newCommands = True
 
     def Resetbutton(self):
         Reset=True
@@ -492,16 +502,6 @@ class App(QWidget):
             self.ForwardLeft.setStyleSheet("background-color: rgb(255, 0, 0);")
         else:
             self.ForwardLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-"""
-if __name__=="__main__":
-    app = QApplication(sys.argv)
-    a = App()
-    i += 1
-    print(i)
-    a.show()
-    sys.exit(app.exec_())
-"""
 
 
 
