@@ -47,7 +47,7 @@ class App(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ROV-AIP USER INTERFACE")
-        self.setGeometry(0,0,1920,1080)
+        self.setGeometry(0,0,2560,1440)
         self.setStyleSheet("background-color: rgb(93, 93, 93);")
 
         self.image_label = QLabel(self)
@@ -254,8 +254,8 @@ class App(QWidget):
         self.ResetButton.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
         self.ResetButton.setObjectName("ResetButton")
         self.ResetButton.setText("Reset")
-        self.ResetButton.clicked.connect(self.Resetbutton)
-
+        self.ResetButton.pressed.connect(self.setReset)
+        self.ResetButton.released.connect(self.releaseReset)
 
         self.ScanMode20m = QtWidgets.QPushButton(self)
         self.ScanMode20m.setGeometry(QtCore.QRect(450, 710, 200, 71))
@@ -382,7 +382,6 @@ class App(QWidget):
         self.thread.start()
 
 
-
     def closeEvent(self, event):
         self.thread.stop()
         event.accept()
@@ -407,14 +406,23 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
 
-    # def set_temp (self, temp):
-    #     self.Temp.display(temp)
+    def setDisplayValues(self):
+        self.Depth.display(self.calculateDepth())
 
-    def set_depth (self, depth):
-        self.Depth.display(depth)
+
+
+    def calculateDepth (self, pressure):
+        # kPa
+
+        # Pressure = density * 9.81 * depth
+        # Depth = Pressure / (density * g)
+        depth = 
+        return depth
 
     def set_salinity (self, salinity):
         self.Salinity.display(salinity)
+
+
 
 
     # GUI functions
@@ -430,11 +438,15 @@ class App(QWidget):
     #Collision Avoid Button
     def userInteractModeSonar(self, mode):
         display_string = ""
-        if mode == 1:
-            display_string = "Collision avoidance"
+        if mode == 0:
+            display_string = "Scanning [20m]"
+        elif mode == 1:
+            display_string = "Scanning [50m]"
         elif mode == 2:
-            display_string = "Aquaculture inspection"
-        
+            display_string = "Collision [2m]"
+        elif mode == 3:
+            display_string = "Collision [4m]"
+
         self.SonarMode.setText(f"Sonar Mode: {display_string}")
         config.mode = mode
         config.newCommands = True
@@ -451,8 +463,13 @@ class App(QWidget):
         config.light = self.Light_Value_Slider.value()
         config.newCommands = True
 
-    def Resetbutton(self):
-        Reset=True
+    def setReset(self):
+        config.forceReset = True
+        config.newCommands = True
+
+    def releaseReset(self):
+        config.forceReset = False
+        config.newCommands = True
 
 
     def Zone0_Warning(self, zone0):

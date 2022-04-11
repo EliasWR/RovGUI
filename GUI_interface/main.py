@@ -83,9 +83,13 @@ def TCPCom():
                 config.pressure = RaspDataIn["pressure"]
                 config.leak = RaspDataIn["leak"]
                 config.interlockedZones = RaspDataIn["lockedZones"]
-
+                
+                # TODO: Plot values on GUI 
+                
                 plotSonarInput(RaspDataIn["angle"], RaspDataIn["step"], RaspDataIn["dataArray"])
                 
+
+
                 new_msg = True
                 full_msg = b""
 
@@ -109,9 +113,11 @@ def TCPCom():
                     "runZone": config.runZone,
                     "mode": config.mode,
                     "forceReset": config.forceReset
+                    # TODO: TAKE PICTURE
+                    # TODO: TAKE MOVIE
                 }
 
-                print(RaspDataOut)
+                print(RaspDataOut)  # Data that was sent through TCP
                 config.newCommands = False
 
                 RaspDataOut = pickle.dumps(RaspDataOut)
@@ -157,14 +163,14 @@ def UDPCom():
     s.close()
 
 
-#Global Variabels
+"""#Global Variabels
 TempValue= 9.81
 DepthValue= 69
 SalinityValue=31.39
 AvgTemp=10
 AvgSalinity=33
 AvgDepth=70
-runZone=-1
+runZone=-1"""
 
 if __name__=="__main__":
 
@@ -179,7 +185,5 @@ if __name__=="__main__":
     other_communication = threading.Thread(target=TCPCom)
     other_communication.start()
 
-
-    
     a.show()
     sys.exit(app.exec_())
