@@ -5,7 +5,7 @@ rovCamera = np.array([])
 # Commands from GUI to raspberry initial values
 light = 0
 runZone = -1
-mode = 0
+mode = 1
 forceReset = False
 
 # Sensor information from Raspberry
