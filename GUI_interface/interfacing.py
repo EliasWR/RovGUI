@@ -49,6 +49,9 @@ class App(QWidget):
         self.setWindowTitle("ROV-AIP USER INTERFACE")
         self.setGeometry(0,0,2560,1440)
         self.setStyleSheet("background-color: rgb(93, 93, 93);")
+        self.g = 9.81 # [m/s^2]
+        self.density = 1000 # [kg/m^3]
+        self.prevLockedZones = [True] * 8
 
         self.image_label = QLabel(self)
         self.image_label.setGeometry(690, 0, 1221, 671) # Last argument 671
@@ -174,7 +177,7 @@ class App(QWidget):
         self.Temp.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Temp.setProperty("value", 0.0)
         self.Temp.setObjectName("Temp")
-        self.Temp.display(config.temp)
+        self.Temp.display(999)
 
         self.Depth = QtWidgets.QLCDNumber(self)
         self.Depth.setGeometry(QtCore.QRect(30, 790, 141, 31))
@@ -184,7 +187,7 @@ class App(QWidget):
         self.Depth.setDigitCount(8)
         self.Depth.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Depth.setObjectName("Depth")
-        self.Depth.display(DepthValue)
+        self.Depth.display(999)
 
         self.Salinity = QtWidgets.QLCDNumber(self)
         self.Salinity.setGeometry(QtCore.QRect(30, 870, 141, 31))
@@ -194,7 +197,29 @@ class App(QWidget):
         self.Salinity.setDigitCount(8)
         self.Salinity.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Salinity.setObjectName("Salinity")
-        self.Salinity.display(SalinityValue)
+        self.Salinity.display(999)
+
+        self.Conductivity = QtWidgets.QLCDNumber(self)
+        self.Conductivity.setGeometry(QtCore.QRect(30, 950, 141, 31))
+        self.Conductivity.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.Conductivity.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.Conductivity.setSmallDecimalPoint(True)
+        self.Conductivity.setDigitCount(8)
+        self.Conductivity.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
+        self.Conductivity.setObjectName("Conductivity")
+        self.Conductivity.display(999)
+
+        self.Density = QtWidgets.QLCDNumber(self)
+        self.Density.setGeometry(QtCore.QRect(30, 1030, 141, 31))
+        self.Density.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.Density.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.Density.setSmallDecimalPoint(True)
+        self.Density.setDigitCount(8)
+        self.Density.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
+        self.Density.setObjectName("Density")
+        self.Density.display(999)
+
+
 
         self.Avg_Temp = QtWidgets.QLCDNumber(self)
         self.Avg_Temp.setGeometry(QtCore.QRect(210, 710, 171, 31))
@@ -266,7 +291,7 @@ class App(QWidget):
 
         self.ScanMode50m = QtWidgets.QPushButton(self)
         self.ScanMode50m.setGeometry(QtCore.QRect(450, 790, 200, 71))
-        self.ScanMode50m.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ScanMode50m.setStyleSheet("background-color: rgb(50, 205, 50);")
         self.ScanMode50m.setObjectName("ScanMode50m")
         self.ScanMode50m.setText("Scanning [50m]")
         self.ScanMode50m.clicked.connect(lambda: self.userInteractModeSonar(1))
@@ -292,21 +317,35 @@ class App(QWidget):
         self.label.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
         self.label.setFrameShape(QtWidgets.QFrame.Panel)
         self.label.setObjectName("label")
-        self.label.setText("Temperature(°C):")
+        self.label.setText("Temperature [°C]:")
 
         self.label_2 = QtWidgets.QLabel(self)
         self.label_2.setGeometry(QtCore.QRect(30, 760, 141, 21))
         self.label_2.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
         self.label_2.setFrameShape(QtWidgets.QFrame.Panel)
         self.label_2.setObjectName("label_2")
-        self.label_2.setText("Depth(m):")
+        self.label_2.setText("Depth [m]:")
 
         self.label_3 = QtWidgets.QLabel(self)
         self.label_3.setGeometry(QtCore.QRect(30, 840, 141, 21))
         self.label_3.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
         self.label_3.setFrameShape(QtWidgets.QFrame.Panel)
         self.label_3.setObjectName("label_3")
-        self.label_3.setText("Salinity(ppm):")
+        self.label_3.setText("Salinity [g/kg] PSU:")
+
+        self.lblConductivity = QtWidgets.QLabel(self)
+        self.lblConductivity.setGeometry(QtCore.QRect(30, 920, 141, 21))
+        self.lblConductivity.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.lblConductivity.setFrameShape(QtWidgets.QFrame.Panel)
+        self.lblConductivity.setObjectName("lblConductivity")
+        self.lblConductivity.setText("Conductivity [mS/cm]:")
+
+        self.lblDensity = QtWidgets.QLabel(self)
+        self.lblDensity.setGeometry(QtCore.QRect(30, 1000, 141, 21))
+        self.lblDensity.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.lblDensity.setFrameShape(QtWidgets.QFrame.Panel)
+        self.lblDensity.setObjectName("lblDensity")
+        self.lblDensity.setText("Water density [kg/m^3]:")
 
         self.label_4 = QtWidgets.QLabel(self)
         self.label_4.setGeometry(QtCore.QRect(210, 680, 171, 21))
@@ -406,24 +445,80 @@ class App(QWidget):
         return QPixmap.fromImage(p)
 
 
-    def setDisplayValues(self):
-        self.Depth.display(self.calculateDepth())
-
-
-
-    def calculateDepth (self, pressure):
-        # kPa
-
-        # Pressure = density * 9.81 * depth
-        # Depth = Pressure / (density * g)
-        depth = 
-        return depth
-
-    def set_salinity (self, salinity):
+    def setDisplayValues(self, temp, depth, leak, lockedZones,
+    salinity, conductivity, density):
+        self.Temp.display(temp)
+        self.Depth.display(depth)
         self.Salinity.display(salinity)
+        self.Conductivity.display(conductivity)
+        self.density = density
+        self.Density.display(self.density)
+        self.configureZonesDisplay(lockedZones)
 
+        # Have to be set last, otherwise could be divide by 0
+        
 
+    def configureZonesDisplay(self, lockedZones):
+        # If no zones are changed, dont perform any action
+        if lockedZones == self.prevLockedZones:
+            return
+        else:
+            print("Changes in locked zones array discovered")
+            for idx, zoneState in enumerate(lockedZones):
+                if lockedZones[idx] != self.prevLockedZones[idx]:
+                    if zoneState:
+                        self.setLockedStatus(idx)
+                    else:
+                        self.resetLockedStatus(idx)
+                    break
+            self.prevLockedZones = lockedZones
+    
+    def setLockedStatus(self, zone):
+        if zone == 0:
+            self.Forward.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 1:
+            self.ForwardRight.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 2:
+            self.Right.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 3:
+            self.ReverseRight.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 4:
+            self.Reverse.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 5:
+            self.ReverseLeft.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 6:
+            self.Left.setStyleSheet("background-color: rgb(200, 134, 134);")
+        elif zone == 7:
+            self.ForwardLeft.setStyleSheet("background-color: rgb(200, 134, 134);")
 
+    def resetLockedStatus(self, zone):
+        if zone == 0:
+            self.Forward.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 1:
+            self.ForwardRight.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 2:
+            self.Right.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 3:
+            self.ReverseRight.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 4:
+            self.Reverse.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 5:
+            self.ReverseLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 6:
+            self.Left.setStyleSheet("background-color: rgb(134, 134, 134);")
+        elif zone == 7:
+            self.ForwardLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
+
+    def resetAllLockedStatus(self):
+        self.prevLockedZones = [False] * 8
+        self.Forward.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ForwardRight.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.Right.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ReverseRight.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.Reverse.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ReverseLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.Left.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.ForwardLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
 
     # GUI functions
     def release(self):
@@ -434,18 +529,33 @@ class App(QWidget):
         config.runZone = zone
         config.newCommands = True
 
-
     #Collision Avoid Button
     def userInteractModeSonar(self, mode):
         display_string = ""
         if mode == 0:
             display_string = "Scanning [20m]"
+            self.ScanMode50m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.ScanMode20m.setStyleSheet("background-color: rgb(50, 205, 50);")
+            self.CollisionAvoid2m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid4m.setStyleSheet("background-color: rgb(134, 134, 134);")
         elif mode == 1:
             display_string = "Scanning [50m]"
+            self.ScanMode50m.setStyleSheet("background-color: rgb(50, 205, 50);")
+            self.ScanMode20m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid2m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid4m.setStyleSheet("background-color: rgb(134, 134, 134);")
         elif mode == 2:
             display_string = "Collision [2m]"
+            self.ScanMode50m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.ScanMode20m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid2m.setStyleSheet("background-color: rgb(50, 205, 50);")
+            self.CollisionAvoid4m.setStyleSheet("background-color: rgb(134, 134, 134);")
         elif mode == 3:
             display_string = "Collision [4m]"
+            self.ScanMode50m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.ScanMode20m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid2m.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.CollisionAvoid4m.setStyleSheet("background-color: rgb(50, 205, 50);")
 
         self.SonarMode.setText(f"Sonar Mode: {display_string}")
         config.mode = mode
@@ -464,6 +574,7 @@ class App(QWidget):
         config.newCommands = True
 
     def setReset(self):
+        self.resetAllLockedStatus()
         config.forceReset = True
         config.newCommands = True
 
@@ -471,55 +582,7 @@ class App(QWidget):
         config.forceReset = False
         config.newCommands = True
 
-
-    def Zone0_Warning(self, zone0):
-        if zone0 == True:
-            self.Forward.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.Forward.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone1_Warning(self, zone1):
-        if zone1 == True:
-            self.ForwardRight.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.ForwardRight.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone2_Warning(self, zone2):
-        if zone2 == True:
-            self.Right.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.Right.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone3_Warning(self, zone3):
-        if zone3 == True:
-            self.ReverseRight.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.ReverseRight.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone4_Warning(self, zone4):
-        if zone4 == True:
-            self.Reverse.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.Reverse.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone5_Warning(self, zone5):
-        if zone5 == True:
-            self.ReverseLeft.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.ReverseLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone6_Warning(self, zone6):
-        if zone6 == True:
-            self.Left.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.Left.setStyleSheet("background-color: rgb(134, 134, 134);")
-
-    def Zone7_Warning(self, zone7):
-        if zone7 == True:
-            self.ForwardLeft.setStyleSheet("background-color: rgb(255, 0, 0);")
-        else:
-            self.ForwardLeft.setStyleSheet("background-color: rgb(134, 134, 134);")
-
+   
 
 
 
