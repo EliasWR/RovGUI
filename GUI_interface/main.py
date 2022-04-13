@@ -70,15 +70,10 @@ def TCPCom():
 
                 RaspDataIn = pickle.loads(full_msg[HEADERSIZE:])
 
-                """
-                img = RaspDataIn["image"]
-                config.leak = RaspDataIn["leak"]
-                """
-
-                # TODO: Plot values on GUI
                 a.setDisplayValues(RaspDataIn["temp"], RaspDataIn["depth"], True,
                 RaspDataIn["lockedZones"], RaspDataIn["salinity"], RaspDataIn["conductivity"],
                 RaspDataIn["density"])
+
                 plotSonarInput(RaspDataIn["angle"], RaspDataIn["step"], RaspDataIn["dataArray"])
                 
                 new_msg = True
@@ -90,6 +85,7 @@ def TCPCom():
                 new_msg = True
                 full_msg = b""
                 
+                
             # If GUI input variables have been changed, respond with new commands
             if config.newCommands:
                 print("[ATTENTION] New commands sent to Raspberry")
@@ -97,10 +93,11 @@ def TCPCom():
 
                 RaspDataOut = {
                     "light": config.light,
+                    "motorSpeed": config.motorSpeed,
                     "runZone": config.runZone,
+                    "forceReset": config.forceReset,
                     "mode": config.mode,
-                    "forceReset": config.forceReset
-                    # TODO: TAKE PICTURE
+                    "takePhoto": config.takePhoto
                     # TODO: TAKE MOVIE
                 }
 
@@ -123,7 +120,7 @@ def UDPCom():
 
     # Getting image udp frame & concate before decode and output image
         
-    # Set up UDP socket
+    # Set up UDP socket server
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('169.254.226.73', 20001))
 

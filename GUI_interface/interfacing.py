@@ -2,6 +2,7 @@ from ast import Lambda
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap
 import sys
@@ -10,14 +11,14 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QThread,QTime,QTimer
 import numpy as np
 import config
 
-# Placeholder variables
+"""# Placeholder variables
 TempValue= 9.81
 DepthValue= 69
 SalinityValue=31.39
 AvgTemp=10
 AvgSalinity=33
 AvgDepth=70
-runZone=-1
+runZone=-1"""
 
 class VideoThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -60,7 +61,7 @@ class App(QWidget):
         self.sonar=QLabel(self)
         self.sonar.setText("Sonar_Placeholder")
         self.sonar.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.sonar.setGeometry(0, 0, 690, 671)
+        self.sonar.setGeometry(15, 15, 640, 640)
         self.sonar.setFrameShape(QtWidgets.QFrame.Panel)
 
         self.Forward = QtWidgets.QToolButton(self)
@@ -231,7 +232,7 @@ class App(QWidget):
         self.Avg_Temp.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Avg_Temp.setProperty("value", 0.0)
         self.Avg_Temp.setObjectName("Avg_Temp")
-        self.Avg_Temp.display(AvgTemp)
+        self.Avg_Temp.display(999)
 
         self.Avg_Salinity = QtWidgets.QLCDNumber(self)
         self.Avg_Salinity.setGeometry(QtCore.QRect(210, 870, 171, 31))
@@ -241,7 +242,7 @@ class App(QWidget):
         self.Avg_Salinity.setDigitCount(8)
         self.Avg_Salinity.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Avg_Salinity.setObjectName("Avg_Salinity")
-        self.Avg_Salinity.display(AvgSalinity)
+        self.Avg_Salinity.display(999)
 
         self.Avg_Depth = QtWidgets.QLCDNumber(self)
         self.Avg_Depth.setGeometry(QtCore.QRect(210, 790, 171, 31))
@@ -251,7 +252,7 @@ class App(QWidget):
         self.Avg_Depth.setDigitCount(8)
         self.Avg_Depth.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Avg_Depth.setObjectName("Avg_Depth")
-        self.Avg_Depth.display(AvgDepth)
+        self.Avg_Depth.display(999)
 
         #Sliders
         self.Light_Value_Slider = QtWidgets.QSlider(self)
@@ -272,15 +273,31 @@ class App(QWidget):
         self.Motor_Speed_Slider.setObjectName("Motor_Speed_Slider")
         self.Motor_Speed_Slider.setMaximum(255)
         self.Motor_Speed_Slider.setMinimum(0)
-        # self.Motor_Speed_Slider.valueChanged.connect(self.valuechangeMS)
+        self.Motor_Speed_Slider.valueChanged.connect(self.userInteractSpeeds)
 
         self.ResetButton = QtWidgets.QPushButton(self)
-        self.ResetButton.setGeometry(QtCore.QRect(1580, 800, 171, 61))
-        self.ResetButton.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.ResetButton.setGeometry(QtCore.QRect(1080, 710, 100, 100))
+        self.ResetButton.setStyleSheet("background-color: rgb(134, 134, 134);")
         self.ResetButton.setObjectName("ResetButton")
-        self.ResetButton.setText("Reset")
+        self.ResetButton.setText("Reset\ninterlocked\nzones")
         self.ResetButton.pressed.connect(self.setReset)
         self.ResetButton.released.connect(self.releaseReset)
+
+        self.TakePhoto = QtWidgets.QPushButton(self)
+        self.TakePhoto.setGeometry(QtCore.QRect(1740, 710, 171, 61))
+        self.TakePhoto.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.TakePhoto.setObjectName("TakePhoto")
+        self.TakePhoto.setText("Take HD photo")
+        self.TakePhoto.pressed.connect(self.takePhoto)
+        self.TakePhoto.released.connect(self.streamVideo)
+
+        self.StartVideo = QtWidgets.QPushButton(self)
+        self.StartVideo.setGeometry(QtCore.QRect(1740, 810, 171, 61))
+        self.StartVideo.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.StartVideo.setObjectName("StartVideo")
+        self.StartVideo.setText("Start video capture")
+        self.StartVideo.pressed.connect(self.takePhoto)
+        self.StartVideo.released.connect(self.streamVideo)
 
         self.ScanMode20m = QtWidgets.QPushButton(self)
         self.ScanMode20m.setGeometry(QtCore.QRect(450, 710, 200, 71))
@@ -312,26 +329,26 @@ class App(QWidget):
 
         #Labels
 
-        self.label = QtWidgets.QLabel(self)
-        self.label.setGeometry(QtCore.QRect(30, 680, 141, 21))
-        self.label.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
-        self.label.setFrameShape(QtWidgets.QFrame.Panel)
-        self.label.setObjectName("label")
-        self.label.setText("Temperature [°C]:")
+        self.lblTemperature = QtWidgets.QLabel(self)
+        self.lblTemperature.setGeometry(QtCore.QRect(30, 680, 141, 21))
+        self.lblTemperature.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.lblTemperature.setFrameShape(QtWidgets.QFrame.Panel)
+        self.lblTemperature.setObjectName("lblTemperature")
+        self.lblTemperature.setText("Temperature [°C]:")
 
-        self.label_2 = QtWidgets.QLabel(self)
-        self.label_2.setGeometry(QtCore.QRect(30, 760, 141, 21))
-        self.label_2.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
-        self.label_2.setFrameShape(QtWidgets.QFrame.Panel)
-        self.label_2.setObjectName("label_2")
-        self.label_2.setText("Depth [m]:")
+        self.lblDepth = QtWidgets.QLabel(self)
+        self.lblDepth.setGeometry(QtCore.QRect(30, 760, 141, 21))
+        self.lblDepth.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.lblDepth.setFrameShape(QtWidgets.QFrame.Panel)
+        self.lblDepth.setObjectName("lblDepth")
+        self.lblDepth.setText("Depth [m]:")
 
-        self.label_3 = QtWidgets.QLabel(self)
-        self.label_3.setGeometry(QtCore.QRect(30, 840, 141, 21))
-        self.label_3.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
-        self.label_3.setFrameShape(QtWidgets.QFrame.Panel)
-        self.label_3.setObjectName("label_3")
-        self.label_3.setText("Salinity [g/kg] PSU:")
+        self.lblSalinity = QtWidgets.QLabel(self)
+        self.lblSalinity.setGeometry(QtCore.QRect(30, 840, 141, 21))
+        self.lblSalinity.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
+        self.lblSalinity.setFrameShape(QtWidgets.QFrame.Panel)
+        self.lblSalinity.setObjectName("lblSalinity")
+        self.lblSalinity.setText("Salinity [g/kg] PSU:")
 
         self.lblConductivity = QtWidgets.QLabel(self)
         self.lblConductivity.setGeometry(QtCore.QRect(30, 920, 141, 21))
@@ -368,35 +385,43 @@ class App(QWidget):
         self.label_6.setObjectName("label_6")
         self.label_6.setText("Average Depth(m):")
 
-        self.label_7 = QtWidgets.QLabel(self)
-        self.label_7.setGeometry(QtCore.QRect(900, 680, 101, 21))
-        self.label_7.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.label_7.setFrameShape(QtWidgets.QFrame.Box)
-        self.label_7.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.label_7.setObjectName("label_7")
-        self.label_7.setText(" Light Value")
+        self.lblLightIntensity = QtWidgets.QLabel(self)
+        self.lblLightIntensity.setGeometry(QtCore.QRect(900, 680, 101, 21))
+        self.lblLightIntensity.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.lblLightIntensity.setFrameShape(QtWidgets.QFrame.Box)
+        self.lblLightIntensity.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.lblLightIntensity.setObjectName("lblLightIntensity")
+        self.lblLightIntensity.setText("Light intensity")
 
-        self.label_8 = QtWidgets.QLabel(self)
-        self.label_8.setGeometry(QtCore.QRect(1260, 680, 91, 20))
-        self.label_8.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.label_8.setFrameShape(QtWidgets.QFrame.Box)
-        self.label_8.setObjectName("label_8")
-        self.label_8.setText("  Controls")
+        self.lblControls = QtWidgets.QLabel(self)
+        self.lblControls.setGeometry(QtCore.QRect(1255, 675, 100, 30))
+        self.lblControls.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.lblControls.setFrameShape(QtWidgets.QFrame.Box)
+        self.lblControls.setObjectName("lblControls")
+        self.lblControls.setFont(QFont('Arial', 14))
+        self.lblControls.setText("Controls")
 
-        self.label_9 = QtWidgets.QLabel(self)
-        self.label_9.setGeometry(QtCore.QRect(1540, 680, 251, 31))
-        self.label_9.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.label_9.setFrameShape(QtWidgets.QFrame.Box)
-        self.label_9.setObjectName("label_9")
-        self.label_9.setText("     Collision Avoidance Reset")
+        self.lblAlarms = QtWidgets.QLabel(self)
+        self.lblAlarms.setGeometry(QtCore.QRect(1500, 675, 100, 30))
+        self.lblAlarms.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.lblAlarms.setFrameShape(QtWidgets.QFrame.Box)
+        self.lblAlarms.setObjectName("lblAlarms")
+        self.lblAlarms.setFont(QFont('Arial', 14))
+        self.lblAlarms.setText("Alarms")
 
-        self.label_11 = QtWidgets.QLabel(self)
-        self.label_11.setGeometry(QtCore.QRect(750, 680, 101, 21))
-        self.label_11.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.label_11.setFrameShape(QtWidgets.QFrame.Box)
-        self.label_11.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.label_11.setObjectName("label_11")
-        self.label_11.setText("Motor Speed")
+        self.lblLeaks = QtWidgets.QLabel(self)
+        self.lblLeaks.setGeometry(QtCore.QRect(1500, 730, 100, 60))
+        self.lblLeaks.setStyleSheet("background-color: rgb(60, 179, 113);")
+        self.lblLeaks.setObjectName("lblLeaks")
+        self.lblLeaks.setText("   No detected\n       leaks")
+
+        self.lblMotorSpeeds = QtWidgets.QLabel(self)
+        self.lblMotorSpeeds.setGeometry(QtCore.QRect(750, 680, 101, 21))
+        self.lblMotorSpeeds.setStyleSheet("background-color: rgb(134, 134, 134);")
+        self.lblMotorSpeeds.setFrameShape(QtWidgets.QFrame.Box)
+        self.lblMotorSpeeds.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.lblMotorSpeeds.setObjectName("lblMotorSpeeds")
+        self.lblMotorSpeeds.setText("Motor Speed")
 
         #Changing Labels
         self.SonarMode = QtWidgets.QLabel(self)
@@ -406,12 +431,7 @@ class App(QWidget):
         self.SonarMode.setObjectName("SonarMode")
         self.SonarMode.setText("Current Sonar Mode: ")
         
-        self.WarningLable = QtWidgets.QLabel(self)
-        self.WarningLable.setGeometry(QtCore.QRect(1550, 740, 231, 31))
-        self.WarningLable.setStyleSheet("background-color: rgb(134, 134, 134);")
-        self.WarningLable.setFrameShape(QtWidgets.QFrame.Box)
-        self.WarningLable.setObjectName("WarningLable")
-        self.WarningLable.setText("Warning in Zone: ")
+        
         
         # create the video capture thread
         self.thread = VideoThread()
@@ -425,17 +445,17 @@ class App(QWidget):
         self.thread.stop()
         event.accept()
 
-    #@pyqtSlot(np.ndarray)
+ 
     def update_image(self, cv_img):
         """Updates the image_label with a new opencv image"""
-        qt_img = self.convert_cv_qt(cv_img)
+        qt_img = self.convert_video_qt(cv_img)
         self.image_label.setPixmap(qt_img)
     
     def update_sonar(self, cv_img):
-        qt_img = self.convert_cv_qt(cv_img)
+        qt_img = self.convert_sonar_qt(cv_img)
         self.sonar.setPixmap(qt_img)
     
-    def convert_cv_qt(self, cv_img):
+    def convert_video_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
         h, w, ch = rgb_image.shape
@@ -444,6 +464,13 @@ class App(QWidget):
         p = convert_to_Qt_format.scaled(1920,960, Qt.KeepAspectRatio)
         return QPixmap.fromImage(p)
 
+    def convert_sonar_qt(self, cv_img):
+        """Convert from an opencv image to QPixmap"""
+        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+        return QPixmap.fromImage(convert_to_Qt_format)
 
     def setDisplayValues(self, temp, depth, leak, lockedZones,
     salinity, conductivity, density):
@@ -451,12 +478,17 @@ class App(QWidget):
         self.Depth.display(depth)
         self.Salinity.display(salinity)
         self.Conductivity.display(conductivity)
+        self.displayLeakStatus(leak)
         self.density = density
         self.Density.display(self.density)
         self.configureZonesDisplay(lockedZones)
 
-        # Have to be set last, otherwise could be divide by 0
         
+    def displayLeakStatus(self, leak):
+        if leak:
+            self.lblLeaks.setStyleSheet("background-color: rgb(255, 0, 0);")
+            self.lblLeaks.setText("    DETECTED\n       LEAKS")
+    
 
     def configureZonesDisplay(self, lockedZones):
         # If no zones are changed, dont perform any action
@@ -562,12 +594,10 @@ class App(QWidget):
         config.newCommands = True
 
 
-    """ 
-    def valuechangeMS(self):
-        global MotorSpeed
-        MotorSpeed = self.Motor_Speed_Slider.value()
-        print(MotorSpeed)
-    """
+    def userInteractSpeeds(self):
+        config.motorSpeed = self.Motor_Speed_Slider.value()
+        config.newCommands = True
+
     
     def userInteractLights(self):
         config.light = self.Light_Value_Slider.value()
@@ -583,6 +613,17 @@ class App(QWidget):
         config.newCommands = True
 
    
+    def takePhoto(self):
+        self.TakePhoto.setStyleSheet("background-color: rgb(50, 205, 50);")
+        config.takePhoto = True
+        config.newCommands = True
+
+    def streamVideo(self):
+        self.TakePhoto.setStyleSheet("background-color: rgb(134, 134, 134);")
+        config.takePhoto = False
+        config.newCommands = True
+
+
 
 
 
