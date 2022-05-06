@@ -35,7 +35,7 @@ class VideoThread(QThread):
                     self.change_pixmap_signal.emit(config.rovCamera)
                     config.rovCamera = np.array([])
             except:
-                print("probably something with datatype")
+                print("Except in VideoThread run function entered.")
 
     def stop(self):
         """
@@ -291,13 +291,13 @@ class App(QWidget):
         self.TakePhoto.pressed.connect(self.takePhoto)
         self.TakePhoto.released.connect(self.streamVideo)
 
-        self.StartVideo = QtWidgets.QPushButton(self)
+        self.StartVideo = QtWidgets.QPushButton("toggle", self)
         self.StartVideo.setGeometry(QtCore.QRect(1740, 810, 171, 61))
         self.StartVideo.setStyleSheet("background-color: rgb(134, 134, 134);")
         self.StartVideo.setObjectName("StartVideo")
         self.StartVideo.setText("Start video capture")
-        self.StartVideo.pressed.connect(self.takePhoto)
-        self.StartVideo.released.connect(self.streamVideo)
+        self.StartVideo.setCheckable(True)
+        self.StartVideo.clicked.connect(self.takeVideo)
 
         self.ScanMode20m = QtWidgets.QPushButton(self)
         self.ScanMode20m.setGeometry(QtCore.QRect(450, 710, 200, 71))
@@ -618,10 +618,23 @@ class App(QWidget):
         config.takePhoto = True
         config.newCommands = True
 
+    def takeVideo(self):
+        if config.takeVideo == False:
+            self.StartVideo.setStyleSheet("background-color: rgb(50, 205, 50);")
+            self.StartVideo.setText("Capturing video...")
+            config.takeVideo = True
+        else:
+            self.StartVideo.setStyleSheet("background-color: rgb(134, 134, 134);")
+            self.StartVideo.setText("Start video capture")
+            config.takeVideo = False
+
+        config.newCommands = True
+
     def streamVideo(self):
         self.TakePhoto.setStyleSheet("background-color: rgb(134, 134, 134);")
         config.takePhoto = False
         config.newCommands = True
+
 
 
 
