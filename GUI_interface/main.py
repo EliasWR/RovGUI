@@ -97,8 +97,8 @@ def TCPCom():
                     "runZone": config.runZone,
                     "forceReset": config.forceReset,
                     "mode": config.mode,
-                    "takePhoto": config.takePhoto
-                    # TODO: TAKE MOVIE
+                    "takePhoto": config.takePhoto,
+                    "takeVideo": config.takeVideo
                 }
 
                 print(RaspDataOut)  # Data that was sent through TCP

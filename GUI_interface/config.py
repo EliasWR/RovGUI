@@ -9,6 +9,7 @@ runZone = -1
 forceReset = False
 mode = 1
 takePhoto = False
+takeVideo = False
 
 # Sensor information from Raspberry
 temp = 0
