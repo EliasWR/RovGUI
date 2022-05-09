@@ -221,7 +221,7 @@ class App(QWidget):
         self.Density.display(999)
 
 
-
+        """
         self.Avg_Temp = QtWidgets.QLCDNumber(self)
         self.Avg_Temp.setGeometry(QtCore.QRect(210, 710, 171, 31))
         self.Avg_Temp.setStyleSheet("background-color: rgb(134, 134, 134);")
@@ -253,6 +253,7 @@ class App(QWidget):
         self.Avg_Depth.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
         self.Avg_Depth.setObjectName("Avg_Depth")
         self.Avg_Depth.display(999)
+        """
 
         #Sliders
         self.Light_Value_Slider = QtWidgets.QSlider(self)
@@ -265,6 +266,7 @@ class App(QWidget):
         self.Light_Value_Slider.setMinimum(0)
         self.Light_Value_Slider.valueChanged.connect(self.userInteractLights)
 
+        """
         self.Motor_Speed_Slider = QtWidgets.QSlider(self)
         self.Motor_Speed_Slider.setGeometry(QtCore.QRect(770, 710, 61, 201))
         self.Motor_Speed_Slider.setStyleSheet("background-color: rgb(134, 134, 134);")
@@ -274,6 +276,7 @@ class App(QWidget):
         self.Motor_Speed_Slider.setMaximum(255)
         self.Motor_Speed_Slider.setMinimum(0)
         self.Motor_Speed_Slider.valueChanged.connect(self.userInteractSpeeds)
+        """
 
         self.ResetButton = QtWidgets.QPushButton(self)
         self.ResetButton.setGeometry(QtCore.QRect(1080, 710, 100, 100))
@@ -364,6 +367,7 @@ class App(QWidget):
         self.lblDensity.setObjectName("lblDensity")
         self.lblDensity.setText("Water density [kg/m^3]:")
 
+        """
         self.label_4 = QtWidgets.QLabel(self)
         self.label_4.setGeometry(QtCore.QRect(210, 680, 171, 21))
         self.label_4.setStyleSheet("\n""background-color: rgb(134, 134, 134);")
@@ -384,7 +388,8 @@ class App(QWidget):
         self.label_6.setFrameShape(QtWidgets.QFrame.Panel)
         self.label_6.setObjectName("label_6")
         self.label_6.setText("Average Depth(m):")
-
+        """
+        
         self.lblLightIntensity = QtWidgets.QLabel(self)
         self.lblLightIntensity.setGeometry(QtCore.QRect(900, 680, 101, 21))
         self.lblLightIntensity.setStyleSheet("background-color: rgb(134, 134, 134);")
@@ -415,6 +420,7 @@ class App(QWidget):
         self.lblLeaks.setObjectName("lblLeaks")
         self.lblLeaks.setText("   No detected\n       leaks")
 
+        """
         self.lblMotorSpeeds = QtWidgets.QLabel(self)
         self.lblMotorSpeeds.setGeometry(QtCore.QRect(750, 680, 101, 21))
         self.lblMotorSpeeds.setStyleSheet("background-color: rgb(134, 134, 134);")
@@ -422,6 +428,7 @@ class App(QWidget):
         self.lblMotorSpeeds.setFrameShadow(QtWidgets.QFrame.Plain)
         self.lblMotorSpeeds.setObjectName("lblMotorSpeeds")
         self.lblMotorSpeeds.setText("Motor Speed")
+        """
 
         #Changing Labels
         self.SonarMode = QtWidgets.QLabel(self)
