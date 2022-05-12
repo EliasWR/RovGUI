@@ -35,7 +35,7 @@ class VideoThread(QThread):
                     self.change_pixmap_signal.emit(config.rovCamera)
                     config.rovCamera = np.array([])
             except:
-                print("Except in VideoThread run function entered.")
+                continue
 
     def stop(self):
         """
@@ -389,7 +389,7 @@ class App(QWidget):
         self.label_6.setObjectName("label_6")
         self.label_6.setText("Average Depth(m):")
         """
-        
+
         self.lblLightIntensity = QtWidgets.QLabel(self)
         self.lblLightIntensity.setGeometry(QtCore.QRect(900, 680, 101, 21))
         self.lblLightIntensity.setStyleSheet("background-color: rgb(134, 134, 134);")

@@ -70,10 +70,9 @@ def TCPCom():
 
                 RaspDataIn = pickle.loads(full_msg[HEADERSIZE:])
 
-                a.setDisplayValues(RaspDataIn["temp"], RaspDataIn["depth"], True,
+                a.setDisplayValues(RaspDataIn["temp"], RaspDataIn["depth"], RaspDataIn["leak"],
                 RaspDataIn["lockedZones"], RaspDataIn["salinity"], RaspDataIn["conductivity"],
                 RaspDataIn["density"])
-
                 plotSonarInput(RaspDataIn["angle"], RaspDataIn["step"], RaspDataIn["dataArray"])
                 
                 new_msg = True
