@@ -22,7 +22,7 @@ from interfacing import VideoThread, App
 import struct
 
 # Sonar constants needed for plotting visualization
-MAX_RANGE = 80*200*1450/2   
+MAX_RANGE = 80*200*1450/2
 LENGTH = 640
 CENTER = (LENGTH/2,LENGTH/2)
 image = np.zeros((LENGTH, LENGTH, 1), np.uint8)
